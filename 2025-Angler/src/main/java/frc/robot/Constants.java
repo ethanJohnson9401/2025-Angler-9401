@@ -84,4 +84,63 @@ public final class Constants {
     }
 
   }
+
+  public static class CoralIntakeConfig extends TalonFXConfiguration{
+
+    /**
+     * Makes new object of Coral Intake Config
+     * 
+     * @param statorLimit Stator current limit of motor
+     * @param supplyLimit Supply current limit of motor
+     * @param acc Target Accerlation of MotionMagic in rps/s
+     * @param velo Target jerk of MotionMagic in rps/s/s
+     */
+    public CoralIntakeConfig(double statorLimit, double supplyLimit, double acc, double jerk, InvertedValue inverted, NeutralModeValue stopType){
+      this.CurrentLimits = new CoralIntakeCurrentConfig(statorLimit,supplyLimit);
+      this.MotionMagic = new CoralIntakeMotionMagicConfig(acc, jerk);
+      this.MotorOutput = new CoralIntakeMotorOutputConfig(inverted, stopType);
+      this.Slot0 = new CoralIntake_PID_Config();
+    }
+
+    private static class CoralIntakeCurrentConfig extends CurrentLimitsConfigs{
+
+      private CoralIntakeCurrentConfig(double statorLimit,double supplyLimit){
+        this.StatorCurrentLimit = statorLimit;
+        this.StatorCurrentLimitEnable = true;
+        
+        this.SupplyCurrentLimit = supplyLimit;
+        this.SupplyCurrentLimitEnable = true;
+      }
+
+    }
+
+    private static class CoralIntakeMotionMagicConfig extends MotionMagicConfigs{
+
+      private CoralIntakeMotionMagicConfig(double acc, double jerk){
+        this.MotionMagicAcceleration = acc;
+        this.MotionMagicJerk = jerk;
+      }
+    }
+
+    private static class CoralIntakeMotorOutputConfig extends MotorOutputConfigs{
+
+      private CoralIntakeMotorOutputConfig(InvertedValue inverted, NeutralModeValue stopType){
+        this.Inverted = inverted;
+        this.NeutralMode = stopType;
+      }
+    }
+
+    private static class CoralIntake_PID_Config extends Slot0Configs{
+      
+      private CoralIntake_PID_Config(){
+        this.kS = 0.25; // Add 0.25 V output to overcome static friction
+        this.kV = 0.12; // A velocity target of 1 rps results in 0.12 V output
+        this.kA = 0.01; // An acceleration of 1 rps/s requires 0.01 V output
+        this.kP = 0.11; // An error of 1 rps results in 0.11 V output
+        this.kI = 0; // no output for integrated error
+        this.kD = 0; // no output for error derivative
+      }
+    }
+
+  }
 }
